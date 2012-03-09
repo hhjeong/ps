@@ -39,9 +39,9 @@ double solve( vector< ii > &SEG, int S, int R, double T ) {
                 run_time = tot_time;
             }
 
-            if( best == -1 || normal_time - tot_time > best_gap ) {
+            if( best == -1 || normal_time / tot_time > best_gap ) {
                 best = i;
-                best_gap = normal_time - tot_time;
+                best_gap = normal_time / tot_time;
                 best_run_time = run_time;
                 best_tot_time = tot_time;
             }
@@ -52,7 +52,7 @@ double solve( vector< ii > &SEG, int S, int R, double T ) {
         ret += best_tot_time;
         used[best] = true;
 
-        fprintf( stderr, "DEBUG : [%d] %d %d %.5f %.5f (%.5f)\n", best, SEG[best].first, SEG[best].second, best_tot_time, best_run_time, T );
+        fprintf( stderr, "DEBUG : [%d] %d %d %.5f (%.5f)\n", best, SEG[best].first, SEG[best].second, best_gap, T );
     }
 
     return ret;
