@@ -17,45 +17,32 @@ typedef long long ll;
 double solve( vector< ii > &SEG, int S, int R, double T ) {
     double ret = 0.0;
     const int N = SEG.size();
-    vector< bool > used( N, false );
-    for( int phase = 0 ; phase < N ; ++phase ) {
-        int best = -1;
-        double best_gap;
-        double best_run_time;
-        double best_tot_time;
-        for( int i = 0 ; i < N ; ++i ) if( !used[i] ) {
-            double normal_time = double( SEG[i].first ) / double( S + SEG[i].second );
-            double possible_run_len = T * ( R + SEG[i].second );
-            double must_walk_len =  SEG[i].first - possible_run_len;
+    for( int i = 0 ; i < N ; ++i ) {
+        double normal_time = double( SEG[i].first ) / double( S + SEG[i].second );
+        double possible_run_len = T * ( R + SEG[i].second );
+        double must_walk_len =  SEG[i].first - possible_run_len;
 
-            double run_time, tot_time;
+        double run_time, tot_time;
 
-            if( must_walk_len > 0.0 ) {
-                tot_time = T + must_walk_len / double( S + SEG[i].second );
-                run_time = T; 
-            }
-            else {
-                tot_time = SEG[i].first / double( R + SEG[i].second );
-                run_time = tot_time;
-            }
-
-            if( best == -1 || normal_time / tot_time > best_gap ) {
-                best = i;
-                best_gap = normal_time / tot_time;
-                best_run_time = run_time;
-                best_tot_time = tot_time;
-            }
+        if( must_walk_len > 0.0 ) {
+            tot_time = T + must_walk_len / double( S + SEG[i].second );
+            run_time = T; 
+        }
+        else {
+            tot_time = SEG[i].first / double( R + SEG[i].second );
+            run_time = tot_time;
         }
 
-        assert( best != -1 );
-        T -= best_run_time;
-        ret += best_tot_time;
-        used[best] = true;
-
-        fprintf( stderr, "DEBUG : [%d] %d %d %.5f (%.5f)\n", best, SEG[best].first, SEG[best].second, best_gap, T );
+        T -= run_time;
+        ret += tot_time;
     }
 
     return ret;
+}
+
+bool cmp( const ii &a, const ii &b ) {
+    if( a.second != b.second ) return a.second < b.second;
+    return a.first < b.first;
 }
 
 int main() {
@@ -86,6 +73,8 @@ int main() {
         if( last < X ) {
             segments.push_back( ii( X-last, 0 ) );
         }
+
+        sort( segments.begin(), segments.end(), cmp );
         printf("%.10f\n", solve( segments, S, R, T ) );
 		fprintf(stderr,"%d/%d\n", caseno, ncase);
     }
