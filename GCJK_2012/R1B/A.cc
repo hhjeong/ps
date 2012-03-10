@@ -14,35 +14,42 @@ using namespace std;
 typedef pair<int,int> ii;
 typedef long long ll;
 
-const int inf = 987654321;
-int N;
-int P[7];
-int R[7][7];
+const ll inf = 987654321987654321LL;
+ll N;
+ll P[7];
+ll R[7][7];
 
-int order[101];
-bool used[101][101][101];
-int cache[101][101][101];
+typedef pair< ll, pair<ll,ll> > node;
+map< node, ll > cache;
 
-int solve( int now, int P1, int P2 ) {
+ll solve( ll now, ll P1, ll P2 ) {
     if( now == N ) return 0;
-    int P3 = N - now - P1 - P2;
+    ll P3 = N - now - P1 - P2;
 
-    int &ret = cache[now][P1][P2];
-    if( used[now][P1][P2] ) return ret;
-    used[now][P1][P2] = true;
+    node state = make_pair( now, make_pair( P1, P2 ) );
+
+    if( cache.count( state ) ) return cache[state];
+
+    ll &ret = cache[state];
     ret = -inf;
-    int now_enemy = order[now];
     
-    if( P1 > 0 ) {
-        ret = max( ret, solve( now+1, P1-1, P2 ) + R[1][now_enemy] );
-    }
-    
-    if( P2 > 0 ) {
-        ret = max( ret, solve( now+1, P1, P2-1 ) + R[2][now_enemy] );
-    }
+    ll S[4] = { 0, P1, P2, P3 };
 
-    if( P3 > 0 ) {
-        ret = max( ret, solve( now+1, P1, P2 ) + R[3][now_enemy] );
+    for( int j = 1 ; j <= 3 ; ++j ) {
+        if( S[j] > 0 ) {
+            for( int i = 4 ; i <= 6 ; ++i ) {
+                if( P[i] > 0 ) {
+                    ll mini = min( S[j], P[i] );
+                    mini = min( 10LL, mini );
+                    S[j] -= mini;
+                    P[i] -= mini;
+                    ret = max( ret, solve( now+mini, S[1], S[2] ) + mini * R[j][i] );
+                    S[j] += mini;
+                    P[i] += mini;
+                    break;
+                }
+            }
+        }
     }
 
     return ret;
@@ -64,16 +71,11 @@ int main() {
             }
         }
 
-        int p = 0;
+        cache.clear();
 
-        for( int i = 0 ; i < P[4] ; ++i ) order[p++] = 4;
-        for( int i = 0 ; i < P[5] ; ++i ) order[p++] = 5;
-        for( int i = 0 ; i < P[6] ; ++i ) order[p++] = 6;
-
-        memset( used, 0, sizeof used );
         printf("Case #%d: ", caseno);
-        printf("%d\n",solve( 0, P[1], P[2] ));
-		fprintf(stderr,"%d/%d\n", caseno, ncase);
+        cout << solve(0,P[1],P[2]) << endl;
+        fprintf(stderr,"%d/%d\n", caseno, ncase);
     }
     fprintf(stderr,"Elapsed time : %.3fsec\n", (double)(clock()-start_time)/CLOCKS_PER_SEC);    
 }
