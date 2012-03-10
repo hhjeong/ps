@@ -23,7 +23,6 @@ int main() {
     for( int caseno = 1 ; caseno <= ncase ; ++caseno ) {
         printf("Case #%d: ", caseno);
 		fprintf(stderr,"%d/%d\n", caseno, ncase);
-        printf("\n");
     }
     fprintf(stderr,"Elapsed time : %.3fsec\n", (double)(clock()-start_time)/CLOCKS_PER_SEC);    
 }
