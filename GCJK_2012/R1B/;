@@ -1,0 +1,93 @@
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+#include <cstring>
+#include <map>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+typedef pair<int,int> ii;
+typedef long long ll;
+
+int N, M, K;
+char board[50][50][50];
+int ngroup = 0;
+int group[50][50][50];
+
+void dfs( int f, int i, int j ) {
+    if( group[f][i][j] != -1 ) return;
+    if( board[f][i][j] != '.' ) return;
+    //fprintf( stderr, "DFS : %d %d %d %d\n", f, i, j, ngroup);
+    group[f][i][j] = ngroup;
+    if( i >= 1 ) dfs( f, i-1, j );
+    if( i < N-1 ) dfs( f, i+1, j );
+    if( j >= 1 ) dfs( f, i, j-1 );
+    if( j < M-1 ) dfs( f, i, j+1 );
+}
+
+void debug() {
+        for( int k = 0 ; k < K ; ++k) {
+            for( int i = 0 ; i < N ; ++i ) {
+                for(int j = 0; j < M ; ++j ) {
+                    if( group[k][i][j] == -1 ) cout << ".";
+                    else  cout << group[k][i][j];
+                }
+                cout << endl;
+            }
+            cout << endl;
+        }
+
+}
+int main() {
+    clock_t start_time = clock();
+    freopen("C.in","r",stdin);
+
+    int ncase;
+    scanf("%d", &ncase); 
+
+    for( int caseno = 1 ; caseno <= ncase ; ++caseno ) {
+        cin >> N >> M >> K;
+        for(int k = 0 ; k < K ; ++k ) {
+            for( int i = 0 ; i < N ; ++i ) {
+                    cin >> board[k][i];
+            }
+        }
+
+        memset( group, -1, sizeof group );
+        for( int f = 0 ; f < K ; ++f ) for( int i = 0 ; i < N ; ++i ) for( int j = 0 ; j < M ; ++j ) if( board[f][i][j] == '.' && group[f][i][j] == -1 ) {
+            dfs( f, i ,j );
+            //fprintf( stderr, "%d %d %d\n", f, i, j );
+        }
+
+        vector< vector<int> > G( ngroup, vector<int>() );
+        set< ii > edges;
+
+        for( int f = 0 ; f < K-1 ; ++f ) {
+            for( int i = 0 ; i < N ; ++i ) for( int j = 0 ; j < M ; ++j ) if( board[f][i][j] == '.' && board[f+1][i][j] == '.' ) {
+                int here = group[f][i][j];
+                int there = group[f+1][i][j];
+                cerr << here << " " << there << endl;
+                if( edges.find( ii(here,there) ) != edges.end() ) continue;
+                edges.insert(ii(here,there));
+                edges.insert(ii(there,here));
+                G[here].push_back( there );
+                G[there].push_back( here );
+            }
+        }
+
+        for( int i = 0 ; i < ngroup ; ++i ) {
+            cerr << i << ": ";
+            for( int j = 0 ; j < G[i].size() ; ++j ) cerr << G[i][j] << " ";
+            cerr << endl;
+        }
+        printf("Case #%d: ", caseno);
+		fprintf(stderr,"%d/%d\n", caseno, ncase);
+        printf("\n");
+    }
+    fprintf(stderr,"Elapsed time : %.3fsec\n", (double)(clock()-start_time)/CLOCKS_PER_SEC);    
+}
