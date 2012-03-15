@@ -26,37 +26,27 @@ bool is_pal( string S ) {
     return S == T;
 }
 
+int N;
 map< pair< string,string >, int > cache;
 
 vector< string > X, Y;
 
-int solve( int i, int j, string left, string right ) {
-    if( i > j ) return is_pal( left + right );
-    if( i == j ) {
-        int ret = is_pal( left + X[i] + right );
-        ret += is_pal( left + Y[i] + right );
-        return ret;
+int right( int j, string S, string T ) {
+    if( j == N / 2 ) {
+        return is_pal( S + T );
+    }
+    if( ! is_ok( S, T ) ) return 0;
+    return right( j-1, S, X[j] + T ) + right( j-1, S, Y[j] + T );
+}
+
+int left( int i, string S ) {
+    if( i > N/2 ) {
+        return right( N-1, S, "" );
     }
 
-    if( ! is_ok( left, right ) ) return 0;
-    pair< string, string > state = make_pair( left, right );
-
-    if( cache.count( state ) ) {
-        return cache[ state ];
-    }
-
-    int &ret = cache[ state ];
-    ret = 0;
-
-    ret += solve( i+1, j-1, left + X[i], X[j] + right );
-    ret += solve( i+1, j-1, left + Y[i], X[j] + right );
-    ret += solve( i+1, j-1, left + X[i], Y[j] + right );
-    ret += solve( i+1, j-1, left + Y[i], Y[j] + right );
-
-    return ret;
+    return left( i+1, X[i] ) + left( i+1, Y[i] );
 }
 int main() {
-    int N;
     cin >> N;
     X.resize( N );
     Y.resize( N );
@@ -64,6 +54,6 @@ int main() {
     for( int i = 0 ; i < N ; ++i ) cin >> X[i];
     for( int i = 0 ; i < N ; ++i ) cin >> Y[i];
 
-    cout << solve( 0, N-1, "", "" ) << endl;
+    cout << left( 0, "" ) << endl;
 }
 
