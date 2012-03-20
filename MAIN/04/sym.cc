@@ -4,6 +4,7 @@
 #include <map>
 #include <utility>
 #include <algorithm>
+#include <cstring>
 typedef long long ll;
 using namespace std;
 
@@ -28,11 +29,11 @@ bool is_pal( string S ) {
 }
 
 int N;
-map< pair< pair<int,int>, pair< string,string > >, ll > cache;
 
+int cache[30][30][2][2];
 vector< string > X, Y;
 
-ll solve( int i, int j, string left, string right ) {
+ll solve( int i, int j, int pi, int pj, string left, string right ) {
     if( i > j ) return is_pal( left + right );
     if( i == j ) {
         int ret = is_pal( left + X[i] + right );
@@ -41,19 +42,20 @@ ll solve( int i, int j, string left, string right ) {
     }
 
     if( ! is_ok( left, right ) ) return 0;
-    pair< pair<int,int>,pair< string, string >  >state = make_pair( make_pair(i,j), make_pair( left, right ) );
 
-    if( cache.count( state ) ) {
-        return cache[ state ];
+
+    int &ret = cache[i][j][pi][pj];
+
+    if( ret != -1 ) {
+        return ret;
     }
 
-    ll &ret = cache[ state ];
     ret = 0;
 
-    ret += solve( i+1, j-1, left + X[i], X[j] + right );
-    ret += solve( i+1, j-1, left + Y[i], X[j] + right );
-    ret += solve( i+1, j-1, left + X[i], Y[j] + right );
-    ret += solve( i+1, j-1, left + Y[i], Y[j] + right );
+    ret += solve( i+1, j-1, 0, 0, left + X[i], X[j] + right );
+    ret += solve( i+1, j-1, 1, 0, left + Y[i], X[j] + right );
+    ret += solve( i+1, j-1, 0, 1, left + X[i], Y[j] + right );
+    ret += solve( i+1, j-1, 1, 1, left + Y[i], Y[j] + right );
 
     return ret;
 }
@@ -65,6 +67,7 @@ int main() {
     for( int i = 0 ; i < N ; ++i ) cin >> X[i];
     for( int i = 0 ; i < N ; ++i ) cin >> Y[i];
 
-    cout << solve( 0, N-1, "", "" ) << endl;
+    memset( cache, -1, sizeof cache );
+    cout << solve( 0, N-1, 0, 0, "", "" ) << endl;
 }
 
