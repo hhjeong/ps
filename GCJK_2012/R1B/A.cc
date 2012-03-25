@@ -26,12 +26,12 @@ ll solve( ll now, ll P1, ll P2 ) {
     if( now == N ) return 0;
     ll P3 = N - now - P1 - P2;
 
-    node state = make_pair( now, make_pair( P1, P2 ) );
+    //node state = make_pair( now, make_pair( P1, P2 ) );
 
-    if( cache.count( state ) ) return cache[state];
+    //if( cache.count( state ) ) return cache[state];
 
-    ll &ret = cache[state];
-    ret = -inf;
+    //ll &ret = cache[state];
+    ll ret = -inf;
     
     ll S[4] = { 0, P1, P2, P3 };
 
@@ -40,13 +40,11 @@ ll solve( ll now, ll P1, ll P2 ) {
             for( int i = 4 ; i <= 6 ; ++i ) {
                 if( P[i] > 0 ) {
                     ll mini = min( S[j], P[i] );
-                    mini = min( 10LL, mini );
                     S[j] -= mini;
                     P[i] -= mini;
                     ret = max( ret, solve( now+mini, S[1], S[2] ) + mini * R[j][i] );
                     S[j] += mini;
                     P[i] += mini;
-                    break;
                 }
             }
         }
@@ -72,9 +70,9 @@ int main() {
         }
 
         cache.clear();
-
         printf("Case #%d: ", caseno);
-        cout << solve(0,P[1],P[2]) << endl;
+        cout << solve( 0, P[1], P[2] ) << endl;
+        // cout << solve(0,P[1],P[2]) << endl;
         fprintf(stderr,"%d/%d\n", caseno, ncase);
     }
     fprintf(stderr,"Elapsed time : %.3fsec\n", (double)(clock()-start_time)/CLOCKS_PER_SEC);    
